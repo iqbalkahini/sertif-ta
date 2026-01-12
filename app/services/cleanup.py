@@ -1,6 +1,7 @@
 """Background cleanup service for removing old PDF files."""
 import asyncio
 import logging
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -35,7 +36,6 @@ class PDFCleanupService:
             logger.debug(f"PDF directory {self.pdf_dir} does not exist, skipping cleanup")
             return 0
 
-        import time
         current_time = time.time()
         expiry_seconds = self.expiry_minutes * 60
         removed_count = 0
@@ -81,7 +81,7 @@ class PDFCleanupService:
         while not self._stop_event.is_set():
             try:
                 # Run cleanup in thread pool to avoid blocking
-                loop = asyncio.get_event_loop()
+                loop = asyncio.get_running_loop()
                 await loop.run_in_executor(None, self.cleanup_old_pdfs)
             except Exception as e:
                 logger.error(f"Error in cleanup loop: {e}")
