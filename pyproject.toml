@@ -5,7 +5,7 @@ requires-python = ">=3.10"
 dependencies = [
     "fastapi==0.115.0",
     "uvicorn[standard]==0.32.0",
-    "weasyprint==62.3",
+    "weasyprint>=67.0",
     "jinja2==3.1.6",
     "pydantic==2.10.6",
     "python-multipart==0.0.20",
