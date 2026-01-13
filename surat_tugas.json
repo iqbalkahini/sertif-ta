@@ -1,0 +1,48 @@
+{
+  "nomor_surat": "800/123/SMK.2/2024",
+  "tanggal_surat": "1 Juli 2024",
+  "tempat_surat": "Singosari",
+  "perihal": "SURAT TUGAS",
+  "school_info": {
+    "nama_sekolah": "SMK NEGERI 2 SINGOSARI",
+    "alamat_jalan": "Jalan Perusahaan No. 20, Tunjungtirto",
+    "kelurahan": "Tunjungtirto",
+    "kecamatan": "Singosari",
+    "kab_kota": "Kab. Malang",
+    "provinsi": "Jawa Timur",
+    "kode_pos": "65153",
+    "telepon": "(0341) 4345127",
+    "email": "smkn2singosari@yahoo.co.id",
+    "website": "www.smkn2singosari.sch.id",
+    "logo_url": "https://lh3.googleusercontent.com/aida-public/AB6AXuCSAHnU4p83SFef3cf83jzDZb1rK5vtW_gexoZYKl4fd8PpcMqeu7fb_nfnJRtaMuGbjPwgDFb9-vUZrfgNge-Lx3nbG6Lk0bQZfltdFr7pWYB8jwFcxooNubLkMiBkls6g7Q3t18RXXmDFGcKYQ9xxDWgHM7jrneVDE1D7ddzQfrU-g5uouKclM2eM0TxrAU6GBHGi-rgDwJwH7X_4MK3Y1szvsVW9fJJhaG1LD--ZSWT2GwQX89zJMCt_Hgr2LfaD98w7oP3Gi9M"
+  },
+  "penandatangan": {
+    "nama": "SUMIJAH, S.Pd., M.Si.",
+    "jabatan": "Kepala SMK Negeri 2 Singosari",
+    "nip": "19700210 199802 2 009",
+    "pangkat": "Pembina Tk. I",
+    "instansi": "SMK Negeri 2 Singosari"
+  },
+  "assignees": [
+    {
+      "nama": "Inasni Dyah Rahmatika, S.Pd.",
+      "jabatan": "Guru",
+      "nip": "19850101 201001 2 005",
+      "instansi": "SMK Negeri 2 Singosari"
+    },
+    {
+        "nama": "Budi Santoso, S.Kom.",
+        "jabatan": "Guru Kejuruan",
+        "instansi": "SMK Negeri 2 Singosari"
+    }
+  ],
+  "details": [
+    { "label": "Keperluan", "value": "Pengantaran Siswa Praktik Kerja Lapangan (PKL)", "separator": ":" },
+    { "label": "Hari / Tanggal", "value": "Senin, 1 Juli 2024", "separator": ":" },
+    { "label": "Waktu", "value": "08.00 – Selesai", "separator": ":" },
+    { "label": "Tempat", "value": "BACAMALANG.COM", "separator": ":" },
+    { "label": "Alamat", "value": "JL. MOROJANTEK NO. 87 B, PANGENTAN, KEC. SINGOSARI, KAB. MALANG", "separator": ":" }
+  ],
+  "pembuka": "Kepala SMK Negeri 2 Singosari Dinas Pendidikan Kabupaten Malang menugaskan kepada :",
+  "penutup": "Demikian surat tugas ini dibuat untuk dilaksanakan dengan sebaik-baiknya dan melaporkan hasilnya kepada kepala sekolah."
+}
