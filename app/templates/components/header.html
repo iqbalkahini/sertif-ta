@@ -1,0 +1,32 @@
+{% macro render_header(info) %}
+<div class="kop-surat" style="position: relative; margin-bottom: 5px; width: 100%;">
+    <!-- Logo -->
+    <div style="position: absolute; left: 0; top: 0; width: 22mm; height: 26mm; display: flex; align-items: center; justify-content: center;">
+        {% if info.logo_url %}
+        <img src="{{ info.logo_url }}" alt="Logo" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+        {% endif %}
+    </div>
+
+    <!-- Text -->
+    <div style="padding-left: 24mm; text-align: center;">
+        <div style="font-size: 11pt; letter-spacing: 1px; text-transform: uppercase;">PEMERINTAH PROVINSI {{ info.provinsi | upper }}</div>
+        <div style="font-size: 13pt; font-weight: bold; text-transform: uppercase; margin-top: 2px;">DINAS PENDIDIKAN</div>
+        <div style="font-size: 16pt; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px;">{{ info.nama_sekolah | upper }}</div>
+        <div style="font-size: 9pt; margin-top: 4px; line-height: 1.2;">
+            {{ info.alamat_jalan }}
+            {% if info.kelurahan %}, Kel. {{ info.kelurahan }}{% endif %}
+            {% if info.kecamatan %}, Kec. {{ info.kecamatan }}{% endif %}
+            , {{ info.kab_kota | replace("Kab. ", "") | replace("Kota ", "") }}
+            , {{ info.provinsi }} {{ info.kode_pos }}
+        </div>
+        <div style="font-size: 9pt; line-height: 1.2;">
+            Telepon: {{ info.telepon }}
+            {% if info.email %} | Email: {{ info.email }}{% endif %}
+            {% if info.website %} | Website: {{ info.website }}{% endif %}
+        </div>
+    </div>
+
+    <!-- Border -->
+    <div style="border-bottom: 3px double #000; margin-top: 6px;"></div>
+</div>
+{% endmacro %}

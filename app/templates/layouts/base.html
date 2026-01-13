@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Surat</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm 2.5cm 2cm 2.5cm;
+        }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            margin: 0;
+            padding: 0;
+            line-height: 1.15; /* Tighter line height for official look */
+            color: #000;
+        }
+        table { border-collapse: collapse; width: 100%; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-justify { text-align: justify; }
+        .font-bold { font-weight: bold; }
+        .uppercase { text-transform: uppercase; }
+        .underline { text-decoration: underline; }
+
+        /* Utility for signature page break avoidance */
+        .signature-block {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    {% block body %}{% endblock %}
+</body>
+</html>

@@ -1,23 +1,22 @@
 from fastapi import FastAPI
-
-from app.api.v1 import letters
-
+from fastapi.staticfiles import StaticFiles
+from brotli_asgi import BrotliMiddleware
+from app.api.v1.router import api_router
 
 app = FastAPI(
-    title="PDF Letter Service",
-    description="Microservice for generating formal PDF letters",
-    version="0.1.0"
+    title="Sistem Surat Menyurat API",
+    description="API for generating official dynamic letters (Surat Dinas, Surat Tugas, etc.)",
+    version="1.0.0"
 )
 
-# Include v1 API routers
-app.include_router(letters.router, prefix="/api/v1")
+# Brotli compression for faster response delivery
+app.add_middleware(BrotliMiddleware, minimum_size=500, gzip_fallback=True)
 
+# Mount static files for logos/assets if needed
+# app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
-async def root() -> dict[str, str]:
-    return {"message": "PDF Letter Service is running"}
-
-
-@app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "healthy"}
+def root():
+    return {"message": "Service is running. Documentation at /docs"}

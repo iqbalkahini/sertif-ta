@@ -1,194 +1,82 @@
 import os
-import re
+from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict
+from typing import Optional
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from weasyprint import HTML, CSS
+from weasyprint.text.fonts import FontConfiguration
+from app.schemas.letter import LetterRequest
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape, TemplateNotFound
-from weasyprint import HTML
-
+# Singleton font configuration - reused across all PDF generations
+_font_config = FontConfiguration()
 
 class PDFGenerator:
-    """Service for generating PDF letters using Jinja2 templates and WeasyPrint."""
-
-    # Maximum PDF file size (10MB) to prevent disk exhaustion
-    MAX_PDF_SIZE = 10 * 1024 * 1024  # 10MB in bytes
-
-    # Regex pattern for safe filenames (alphanumeric, underscore, hyphen, spaces, dots)
-    SAFE_FILENAME_PATTERN = re.compile(r'^[\w\s.-]+$')
-
-    SUPPORTED_TEMPLATES = [
-        "surat_dinas",
-        "surat_edaran",
-        "surat_pemberitahuan"
-    ]
-
-    def __init__(
-        self,
-        templates_dir: str | None = None,
-        output_dir: str = "output"
-    ):
-        """
-        Initialize the PDF generator.
-
-        Args:
-            templates_dir: Path to templates directory. Defaults to app/templates.
-            output_dir: Path to output directory for generated PDFs.
-        """
-        if templates_dir is None:
-            # Default to app/templates relative to this file
-            current_dir = Path(__file__).parent.parent
-            templates_dir = current_dir / "templates"
-
-        self.templates_dir = Path(templates_dir)
-        self.output_dir = Path(output_dir)
-        # Define allowed static directory for logos
-        self.static_dir = Path(__file__).parent.parent / "static"
-
-        # Ensure output directory exists
+    def __init__(self, templates_dir: str = "app/templates", output_dir: str = "output"):
+        self.base_dir = Path(os.getcwd())
+        self.templates_dir = self.base_dir / templates_dir
+        self.output_dir = self.base_dir / output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Setup Jinja2 environment with autoescape enabled for security
+        # Jinja2 environment with auto-caching
         self.env = Environment(
             loader=FileSystemLoader(str(self.templates_dir)),
-            autoescape=select_autoescape(['html', 'xml'])
+            autoescape=select_autoescape(['html', 'xml']),
+            auto_reload=False  # Disable reload checks for production speed
         )
 
-    def generate(
-        self,
-        template_name: str,
-        data: Dict[str, Any],
-        logo_path: str | None = None
-    ) -> bytes:
+    def generate(self, request: LetterRequest, custom_filename: Optional[str] = None) -> str:
         """
-        Generate a PDF from a template and data.
-
-        Args:
-            template_name: Name of the template (without .html extension).
-            data: Dictionary of data to pass to the template.
-            logo_path: Optional path to logo image.
-
-        Returns:
-            PDF file as bytes.
-
-        Raises:
-            ValueError: If template is not found or not supported.
+        Generates a PDF based on the letter request.
+        Returns the path to the generated PDF.
         """
-        template_file = f"{template_name}.html"
-
-        if template_name not in self.SUPPORTED_TEMPLATES:
-            raise ValueError(
-                f"Template '{template_name}' is not supported. "
-                f"Supported templates: {', '.join(self.SUPPORTED_TEMPLATES)}"
-            )
-
+        template_name = f"letters/{request.template_type}.html"
         try:
-            template = self.env.get_template(template_file)
-        except TemplateNotFound:
-            raise ValueError(
-                f"Template file '{template_file}' not found in {self.templates_dir}"
-            )
+            template = self.env.get_template(template_name)
+        except Exception as e:
+            raise ValueError(f"Template '{template_name}' not found. Error: {e}")
 
-        # Prepare context for template
-        context = data.copy()
-        if logo_path:
-            # Validate logo path - only allow files within app/static/ directory
-            try:
-                # Resolve the logo path to check for traversal attempts
-                logo_path_obj = Path(logo_path).resolve()
+        # Prepare context
+        context = request.model_dump()
 
-                # Resolve static directory path
-                static_dir_resolved = self.static_dir.resolve()
-
-                # Check if the resolved logo path is within static directory
-                if logo_path_obj.exists() and logo_path_obj.is_file():
-                    # Verify the path is within static directory using relative_to
-                    # This will raise ValueError if path is outside static_dir
-                    logo_path_obj.relative_to(static_dir_resolved)
-                    # Store relative path from templates dir for WeasyPrint
-                    context["logo_path"] = logo_path
-                else:
-                    # Try relative path from static dir
-                    relative_path = self.static_dir / logo_path
-                    if relative_path.exists() and relative_path.is_file():
-                        # Verify again after resolution
-                        relative_path.resolve().relative_to(static_dir_resolved)
-                        context["logo_path"] = f"static/{logo_path}"
-                    else:
-                        # File doesn't exist or is invalid - don't set logo_path
-                        # Fail closed: no logo path if validation fails
-                        pass
-            except (OSError, ValueError):
-                # Path traversal attempt or invalid path - fail closed, don't set logo
-                pass
+        # Flatten content dict to top level for easier access in templates
+        # (while keeping 'content' key for backward compatibility)
+        if 'content' in context and isinstance(context['content'], dict):
+            context.update(context['content'])
 
         # Render HTML
-        html_string = template.render(data=context)
+        html_string = template.render(**context)
 
-        # Convert to PDF using WeasyPrint
-        html = HTML(string=html_string, base_url=str(self.templates_dir))
-        pdf_bytes = html.write_pdf()
+        # Determine filename
+        if custom_filename:
+            filename = custom_filename
+            if not filename.endswith(".pdf"):
+                filename += ".pdf"
+        else:
+            filename = f"{request.template_type}_{request.nomor_surat.replace('/', '-')}.pdf"
 
-        return pdf_bytes
+        output_path = self.output_dir / filename
 
-    def save_pdf(
-        self,
-        pdf_bytes: bytes,
-        filename: str
-    ) -> str:
+        # Generate PDF with cached font configuration
+        html_doc = HTML(string=html_string, base_url=str(self.templates_dir))
+        html_doc.write_pdf(str(output_path), font_config=_font_config)
+
+        return str(output_path)
+
+    def generate_bytes(self, request: LetterRequest) -> BytesIO:
         """
-        Save PDF bytes to a file.
-
-        Args:
-            pdf_bytes: PDF file content as bytes.
-            filename: Name of the file to save (without .pdf extension).
-
-        Returns:
-            Full path to the saved PDF file.
-
-        Raises:
-            ValueError: If filename is invalid or PDF size exceeds limit.
+        Generate PDF and return as BytesIO for streaming response.
+        Faster for direct downloads without file I/O.
         """
-        # Validate PDF size before writing
-        if len(pdf_bytes) > self.MAX_PDF_SIZE:
-            raise ValueError(
-                f"PDF size ({len(pdf_bytes)} bytes) exceeds maximum allowed size "
-                f"({self.MAX_PDF_SIZE} bytes)"
-            )
+        template_name = f"letters/{request.template_type}.html"
+        try:
+            template = self.env.get_template(template_name)
+        except Exception as e:
+            raise ValueError(f"Template '{template_name}' not found. Error: {e}")
 
-        # Check for path traversal attempts BEFORE applying basename
-        # This prevents inputs like "../../../etc/passwd" from becoming "passwd"
-        if ".." in filename or "/" in filename or "\\" in filename:
-            raise ValueError(
-                f"Invalid filename '{filename}'. "
-                f"Path traversal attempts are not allowed."
-            )
+        context = request.model_dump()
+        html_string = template.render(**context)
 
-        # Sanitize filename to prevent path traversal attacks
-        # Extract only the basename to remove any directory components
-        safe_filename = os.path.basename(filename)
+        html_doc = HTML(string=html_string, base_url=str(self.templates_dir))
+        pdf_bytes = html_doc.write_pdf(font_config=_font_config)
 
-        # Remove .pdf extension if present for validation
-        name_without_ext = safe_filename.replace(".pdf", "")
-
-        # Validate filename contains only safe characters
-        if not self.SAFE_FILENAME_PATTERN.match(name_without_ext):
-            raise ValueError(
-                f"Invalid filename '{filename}'. "
-                f"Filename must contain only alphanumeric characters, spaces, "
-                f"underscores, hyphens, and dots."
-            )
-
-        # Ensure .pdf extension
-        if not safe_filename.endswith(".pdf"):
-            safe_filename = f"{safe_filename}.pdf"
-
-        # Final validation that filename is not empty
-        if not safe_filename or safe_filename == ".pdf":
-            raise ValueError("Invalid filename: filename cannot be empty")
-
-        file_path = self.output_dir / safe_filename
-
-        with open(file_path, "wb") as f:
-            f.write(pdf_bytes)
-
-        return str(file_path)
+        return BytesIO(pdf_bytes)
