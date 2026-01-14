@@ -9,24 +9,6 @@ from datetime import datetime
 router = APIRouter()
 pdf_service = PDFGenerator()
 
-@router.post("/generate", response_model=PDFResponse)
-async def generate_letter(request: LetterRequest):
-    """Generic endpoint for any letter template."""
-    try:
-        file_path = pdf_service.generate(request)
-        filename = os.path.basename(file_path)
-        file_size = os.path.getsize(file_path)
-
-        return PDFResponse(
-            filename=filename,
-            file_url=f"/api/v1/letters/download/{filename}",
-            file_size=file_size
-        )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
-
 @router.post("/surat-tugas", response_model=PDFResponse)
 async def generate_surat_tugas(request: SuratTugasRequest):
     """Specific endpoint for Surat Tugas with strict schema."""

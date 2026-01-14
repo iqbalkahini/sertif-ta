@@ -17,6 +17,3 @@ app.add_middleware(BrotliMiddleware, minimum_size=500, gzip_fallback=True)
 
 app.include_router(api_router, prefix="/api/v1")
 
-@app.get("/")
-def root():
-    return {"message": "Service is running. Documentation at /docs"}
