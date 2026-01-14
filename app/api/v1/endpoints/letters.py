@@ -9,27 +9,22 @@ from datetime import datetime
 router = APIRouter()
 pdf_service = PDFGenerator()
 
-@router.post("/generate", response_model=PDFResponse)
-async def generate_letter(request: LetterRequest):
-    """Generic endpoint for any letter template."""
-    try:
-        file_path = pdf_service.generate(request)
-        filename = os.path.basename(file_path)
-        file_size = os.path.getsize(file_path)
-
-        return PDFResponse(
-            filename=filename,
-            file_url=f"/api/v1/letters/download/{filename}",
-            file_size=file_size
-        )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
-
 @router.post("/surat-tugas", response_model=PDFResponse)
 async def generate_surat_tugas(request: SuratTugasRequest):
-    """Specific endpoint for Surat Tugas with strict schema."""
+    """
+    Generate a Surat Tugas PDF from the provided SuratTugasRequest.
+    
+    Preprocesses the request.school_info to remove redundant kelurahan/kecamatan if they appear in alamat_jalan, converts the request into a generic LetterRequest for the PDF service, and constructs a custom filename in the form "SURAT_TUGAS_{FIRST_ASSIGNEE}_{dd-mm-yyyy}.pdf". Returns a PDFResponse pointing to the generated file.
+    
+    Parameters:
+        request (SuratTugasRequest): Input data for the Surat Tugas; its fields are mapped into the PDF template and used to build the output filename.
+    
+    Returns:
+        PDFResponse: Contains `filename` (generated file name), `file_url` (download endpoint), and `file_size` (bytes).
+    
+    Raises:
+        HTTPException: Raised with status_code 500 if PDF generation or file handling fails.
+    """
     try:
         # Pre-process School Info to ensure Address fits in 1 line (2 lines total with phone)
         # Fix duplication issues like "Tunjungtirto, Tunjungtirto"
