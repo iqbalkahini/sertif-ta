@@ -11,17 +11,17 @@ pip install -e .
 ## Running
 
 ```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8002
 ```
 
-API Documentation: http://localhost:8000/docs
+API Documentation: http://localhost:8002/docs
 
 ## API Usage
 
 ### Generate Letter
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/letters/generate \
+curl -X POST http://localhost:8002/api/v1/letters/generate \
   -H "Content-Type: application/json" \
   -d '{
     "type": "surat_dinas",
