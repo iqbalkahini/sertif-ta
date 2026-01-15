@@ -4,7 +4,7 @@ from brotli_asgi import BrotliMiddleware
 from app.api.v1.router import api_router
 
 app = FastAPI(
-    title="surat - sertif mcsrvce",
+    title="surat - sertif",
     description="surat - tugas(done), pengantaran - monitoring1 - monitoring 2 - penjemputan"
                 "lembar-persetujuan untuk siswa konfirmasi dan ttd ke industri",
     version="1.0.0"
