@@ -34,12 +34,36 @@ class SchoolInfo(BaseModel):
     }
 
 class Person(BaseModel):
-    """Generic person model for assignees and signatories."""
-    nama: str
-    jabatan: str | None = None
-    nip: str | None = None
-    pangkat: str | None = None
-    instansi: str | None = None
+    nama: str = Field(..., description="Nama lengkap", examples=["SUMIJAH, S.Pd., M.Si."])
+    jabatan: str | None = Field(None, description="Jabatan/posisi", examples=["Kepala SMK Negeri 2 Singosari"])
+    nip: str | None = Field(None, description="Nomor Induk Pegawai", examples=["19700210 199802 2 009"])
+    pangkat: str | None = Field(None, description="Pangkat/golongan", examples=["Pembina Tk. I"])
+    instansi: str | None = Field(None, description="Instansi/lembaga", examples=["SMK Negeri 2 Singosari"])
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "nama": "SUMIJAH, S.Pd., M.Si.",
+                    "jabatan": "Kepala SMK Negeri 2 Singosari",
+                    "nip": "19700210 199802 2 009",
+                    "pangkat": "Pembina Tk. I",
+                    "instansi": "SMK Negeri 2 Singosari"
+                },
+                {
+                    "nama": "Inasni Dyah Rahmatika, S.Pd.",
+                    "jabatan": "Guru",
+                    "nip": "19850101 201001 2 005",
+                    "instansi": "SMK Negeri 2 Singosari"
+                },
+                {
+                    "nama": "Budi Santoso, S.Kom.",
+                    "jabatan": "Guru Kejuruan",
+                    "instansi": "SMK Negeri 2 Singosari"
+                }
+            ]
+        }
+    }
 
 class KeyValueItem(BaseModel):
     """Helper for displaying key-value pairs (e.g. 'Waktu' : '08.00')."""
