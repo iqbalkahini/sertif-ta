@@ -167,19 +167,36 @@ class SuratTugasRequest(BaseModel):
     }
 
 class LembarPersetujuanRequest(BaseModel):
-    """Request schema for Lembar Persetujuan PKL."""
-    school_info: SchoolInfo
+    school_info: SchoolInfo = Field(..., description="Informasi sekolah untuk kop surat")
 
-    # Siswa details
-    students: Annotated[List[Person], Field(min_length=1)]
+    students: Annotated[List[Student], Field(min_length=1, description="Daftar siswa PKL")]
 
-    # DU/DI Info
-    nama_perusahaan: str
+    nama_perusahaan: str = Field(..., description="Nama perusahaan/DU/DI tempat PKL", examples=["JTV MALANG"])
 
-    # Signature placeholder
-    tempat_tanggal: str | None = None
+    tempat_tanggal: str | None = Field(None, description="Tempat dan tanggal surat", examples=["Malang, 12 Januari 2026"])
 
-    model_config = {"json_schema_extra": {"examples": [{"nama_perusahaan": "JTV MALANG", "tempat_tanggal": "Malang, 12 Januari 2026"}]}}
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "school_info": {
+                        "nama_sekolah": "SMK NEGERI 2 SINGOSARI",
+                        "alamat_jalan": "Jalan Perusahaan No. 20",
+                        "kab_kota": "Kab. Malang",
+                        "provinsi": "Jawa Timur",
+                        "kode_pos": "65153",
+                        "telepon": "(0341) 458823"
+                    },
+                    "students": [
+                        {"nama": "CHANDA ZULIA LESTARI"},
+                        {"nama": "DIWA SASRI HALIA"}
+                    ],
+                    "nama_perusahaan": "JTV MALANG",
+                    "tempat_tanggal": "Malang, 12 Januari 2026"
+                }
+            ]
+        }
+    }
 
 
 # --- Generic/Legacy Request Models ---
