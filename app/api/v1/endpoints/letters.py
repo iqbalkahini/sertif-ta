@@ -88,28 +88,37 @@ async def generate_lembar_persetujuan(request: LembarPersetujuanRequest):
     """
     Generate Lembar Persetujuan PKL (Internship Approval Letter) PDF.
 
-    Creates a student approval document for PKL placement with:
+    Creates a student approval document for PKL placement containing:
     - School information and letterhead
-    - Student details (one or more)
-    - Company/industry information
-    - Signature sections
+    - Student list (minimum 1 student)
+    - Company/industry (DU/DI) information
+    - Signature sections for school and company
 
-    The filename format is: `LEMBAR_PERSETUJUAN_{COMPANY}_{date}.pdf`
+    **Request Body:**
+    - `school_info`: School information for letterhead
+    - `students`: Array of students with at least `nama` field
+    - `nama_perusahaan`: Company/industry name
+    - `tempat_tanggal`: Place and date for signature (optional)
+
+    **Response:**
+    Returns filename, download URL, and file size in bytes.
+
+    **Filename Format:** `LEMBAR_PERSETUJUAN_{COMPANY}_{dd-mm-yyyy}.pdf`
     """
     try:
         logger.info(f"Generating Lembar Persetujuan for {request.school_info.nama_sekolah}")
 
-        # Pre-process School Info
         request.school_info = preprocess_school_info(request.school_info)
 
-        # Convert specific request to generic LetterRequest
+        students_as_persons = [Person(nama=s.nama) for s in request.students]
+
         generic_request = LetterRequest(
             template_type="lembar_persetujuan",
-            nomor_surat="PKL/PST/001",  # Placeholder, not shown in template
-            tanggal_surat=datetime.now().strftime("%d %B %Y"), # Placeholder
+            nomor_surat="PKL/PST/001",
+            tanggal_surat=datetime.now().strftime("%d %B %Y"),
             perihal="LEMBAR PERSETUJUAN",
             school_info=request.school_info,
-            penandatangan=request.students[0], # Placeholder required by schema
+            penandatangan=students_as_persons[0],
             content={
                 "students": request.students,
                 "nama_perusahaan": request.nama_perusahaan,
