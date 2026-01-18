@@ -216,7 +216,24 @@ class LetterRequest(BaseModel):
     content: Dict[str, Any]
 
 class PDFResponse(BaseModel):
-    filename: str
-    file_url: str
-    file_size: int
+    filename: str = Field(..., description="Nama file PDF yang dihasilkan", examples=["SURAT_TUGAS_INASNI_DYAH_RAHMATIKA_01-07-2024.pdf"])
+    file_url: str = Field(..., description="URL untuk mengunduh file PDF", examples=["/api/v1/letters/download/SURAT_TUGAS_INASNI_DYAH_RAHMATIKA_01-07-2024.pdf"])
+    file_size: int = Field(..., description="Ukuran file dalam bytes", examples=[45678])
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "filename": "SURAT_TUGAS_INASNI_DYAH_RAHMATIKA_01-07-2024.pdf",
+                    "file_url": "/api/v1/letters/download/SURAT_TUGAS_INASNI_DYAH_RAHMATIKA_01-07-2024.pdf",
+                    "file_size": 45678
+                },
+                {
+                    "filename": "LEMBAR_PERSETUJUAN_JTV_MALANG_12-01-2026.pdf",
+                    "file_url": "/api/v1/letters/download/LEMBAR_PERSETUJUAN_JTV_MALANG_12-01-2026.pdf",
+                    "file_size": 32456
+                }
+            ]
+        }
+    }
     
