@@ -1,7 +1,8 @@
 import os
+import re
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
-from app.schemas.letter import LetterRequest, SuratTugasRequest, LembarPersetujuanRequest, PDFResponse
+from app.schemas.letter import LetterRequest, SuratTugasRequest, LembarPersetujuanRequest, PDFResponse, Person
 from app.services.pdf_generator import PDFGenerator
 from app.utils import parse_indonesian_date, preprocess_school_info
 from app.core import get_logger
@@ -14,14 +15,31 @@ logger = get_logger(__name__)
 @router.post("/surat-tugas", response_model=PDFResponse, summary="Generate Surat Tugas PDF")
 async def generate_surat_tugas(request: SuratTugasRequest):
     """
-    Generate Surat Tugas PDF document.
+    Generate Surat Tugas (Assignment Letter) PDF document.
 
-    Creates a professionally formatted Surat Tugas (Assignment Letter) PDF with:
-    - School letterhead (kop surat)
-    - Assignment details for one or more recipients
-    - Authorized signature section
+    Creates a professionally formatted assignment letter containing:
+    - School letterhead (kop surat) with logo
+    - Letter number, date, and location
+    - Assignee details (one or more persons)
+    - Assignment details (key-value pairs)
+    - Signatory section
 
-    The filename format is: `SURAT_TUGAS_{FIRST_ASSIGNEE}_{dd-mm-yyyy}.pdf`
+    **Request Body:**
+    - `nomor_surat`: Letter number (e.g., "800/123/SMK.2/2024")
+    - `tanggal_surat`: Date in Indonesian format (e.g., "1 Juli 2024")
+    - `tempat_surat`: Place of issue (optional)
+    - `perihal`: Subject (default: "SURAT TUGAS")
+    - `school_info`: Complete school information
+    - `penandatangan`: Signatory details
+    - `assignees`: Array of assigned persons
+    - `details`: Array of key-value items for assignment details
+    - `pembuka`: Opening paragraph (optional)
+    - `penutup`: Closing paragraph (optional)
+
+    **Response:**
+    Returns filename, download URL, and file size in bytes.
+
+    **Filename Format:** `SURAT_TUGAS_{FIRST_ASSIGNEE}_{dd-mm-yyyy}.pdf`
     """
     try:
         logger.info(f"Generating Surat Tugas: {request.nomor_surat} for {request.school_info.nama_sekolah}")
@@ -47,7 +65,8 @@ async def generate_surat_tugas(request: SuratTugasRequest):
         )
 
         # Custom Filename: SURAT_TUGAS_{NAME}_dd-mm-yyyy.pdf
-        first_assignee = request.assignees[0].nama.replace(" ", "_").upper() if request.assignees else "UNKNOWN"
+        first_assignee = request.assignees[0].nama if request.assignees else "UNKNOWN"
+        first_assignee = re.sub(r'[^a-zA-Z0-9\s]', '', first_assignee).replace(" ", "_").upper()
         date_str = parse_indonesian_date(request.tanggal_surat)
         custom_filename = f"SURAT_TUGAS_{first_assignee}_{date_str}.pdf"
 
@@ -71,28 +90,37 @@ async def generate_lembar_persetujuan(request: LembarPersetujuanRequest):
     """
     Generate Lembar Persetujuan PKL (Internship Approval Letter) PDF.
 
-    Creates a student approval document for PKL placement with:
+    Creates a student approval document for PKL placement containing:
     - School information and letterhead
-    - Student details (one or more)
-    - Company/industry information
-    - Signature sections
+    - Student list (minimum 1 student)
+    - Company/industry (DU/DI) information
+    - Signature sections for school and company
 
-    The filename format is: `LEMBAR_PERSETUJUAN_{COMPANY}_{date}.pdf`
+    **Request Body:**
+    - `school_info`: School information for letterhead
+    - `students`: Array of students with at least `nama` field
+    - `nama_perusahaan`: Company/industry name
+    - `tempat_tanggal`: Place and date for signature (optional)
+
+    **Response:**
+    Returns filename, download URL, and file size in bytes.
+
+    **Filename Format:** `LEMBAR_PERSETUJUAN_{COMPANY}_{dd-mm-yyyy}.pdf`
     """
     try:
         logger.info(f"Generating Lembar Persetujuan for {request.school_info.nama_sekolah}")
 
-        # Pre-process School Info
         request.school_info = preprocess_school_info(request.school_info)
 
-        # Convert specific request to generic LetterRequest
+        students_as_persons = [Person(nama=s.nama) for s in request.students]
+
         generic_request = LetterRequest(
             template_type="lembar_persetujuan",
-            nomor_surat="PKL/PST/001",  # Placeholder, not shown in template
-            tanggal_surat=datetime.now().strftime("%d %B %Y"), # Placeholder
+            nomor_surat="PKL/PST/001",
+            tanggal_surat=datetime.now().strftime("%d %B %Y"),
             perihal="LEMBAR PERSETUJUAN",
             school_info=request.school_info,
-            penandatangan=request.students[0], # Placeholder required by schema
+            penandatangan=students_as_persons[0],
             content={
                 "students": request.students,
                 "nama_perusahaan": request.nama_perusahaan,
@@ -101,7 +129,7 @@ async def generate_lembar_persetujuan(request: LembarPersetujuanRequest):
         )
 
         # Custom Filename: LEMBAR_PERSETUJUAN_{COMPANY}_{DATE}.pdf
-        company_name = request.nama_perusahaan.replace(" ", "_").upper()
+        company_name = re.sub(r'[^a-zA-Z0-9\s]', '', request.nama_perusahaan).replace(" ", "_").upper()
         date_str = datetime.now().strftime("%d-%m-%Y")
         custom_filename = f"LEMBAR_PERSETUJUAN_{company_name}_{date_str}.pdf"
 

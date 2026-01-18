@@ -24,7 +24,8 @@ class ValidationMiddleware(BaseHTTPMiddleware):
 
         # Validate path parameters for downloads
         if request.url.path.startswith("/api/v1/letters/download/"):
-            filename = request.path_params.get("filename", "")
+            # Extract filename from URL path (path params not available in middleware)
+            filename = request.url.path.split("/api/v1/letters/download/")[-1]
             if not self._is_valid_filename(filename):
                 logger.warning(f"Invalid filename detected: {filename}")
                 from fastapi.responses import JSONResponse
