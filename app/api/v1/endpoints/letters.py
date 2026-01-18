@@ -1,4 +1,5 @@
 import os
+import re
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 from app.schemas.letter import LetterRequest, SuratTugasRequest, LembarPersetujuanRequest, PDFResponse, Person
@@ -64,7 +65,8 @@ async def generate_surat_tugas(request: SuratTugasRequest):
         )
 
         # Custom Filename: SURAT_TUGAS_{NAME}_dd-mm-yyyy.pdf
-        first_assignee = request.assignees[0].nama.replace(" ", "_").upper() if request.assignees else "UNKNOWN"
+        first_assignee = request.assignees[0].nama if request.assignees else "UNKNOWN"
+        first_assignee = re.sub(r'[^a-zA-Z0-9\s]', '', first_assignee).replace(" ", "_").upper()
         date_str = parse_indonesian_date(request.tanggal_surat)
         custom_filename = f"SURAT_TUGAS_{first_assignee}_{date_str}.pdf"
 
@@ -127,7 +129,7 @@ async def generate_lembar_persetujuan(request: LembarPersetujuanRequest):
         )
 
         # Custom Filename: LEMBAR_PERSETUJUAN_{COMPANY}_{DATE}.pdf
-        company_name = request.nama_perusahaan.replace(" ", "_").upper()
+        company_name = re.sub(r'[^a-zA-Z0-9\s]', '', request.nama_perusahaan).replace(" ", "_").upper()
         date_str = datetime.now().strftime("%d-%m-%Y")
         custom_filename = f"LEMBAR_PERSETUJUAN_{company_name}_{date_str}.pdf"
 
