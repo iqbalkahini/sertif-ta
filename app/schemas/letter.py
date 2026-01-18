@@ -98,23 +98,73 @@ class Student(BaseModel):
 # --- Specific Request Models ---
 
 class SuratTugasRequest(BaseModel):
-    """Strictly typed request for Surat Tugas generation."""
-    nomor_surat: str
-    tanggal_surat: str
-    tempat_surat: str | None = None
-    perihal: str = "SURAT TUGAS"
+    nomor_surat: str = Field(..., description="Nomor surat", examples=["800/123/SMK.2/2024"])
+    tanggal_surat: str = Field(..., description="Tanggal surat dalam format Indonesia", examples=["1 Juli 2024"])
+    tempat_surat: str | None = Field(None, description="Tempat penerbitan surat", examples=["Singosari"])
+    perihal: str = Field("SURAT TUGAS", description="Perihal/subjek surat", examples=["SURAT TUGAS"])
 
-    school_info: SchoolInfo
-    penandatangan: Person
+    school_info: SchoolInfo = Field(..., description="Informasi sekolah untuk kop surat")
+    penandatangan: Person = Field(..., description="Pejabat penandatangan surat")
 
-    # Content specific to Surat Tugas
-    assignees: List[Person]
-    details: List[KeyValueItem]
+    assignees: List[Person] = Field(..., description="Daftar orang yang ditugaskan", min_length=1)
+    details: List[KeyValueItem] = Field(..., description="Detail tugas dalam format key-value")
 
-    pembuka: str | None = None
-    penutup: str | None = None
+    pembuka: str | None = Field(None, description="Kalimat pembuka surat", examples=["Kepala SMK Negeri 2 Singosari Dinas Pendidikan Kabupaten Malang menugaskan kepada :"])
+    penutup: str | None = Field(None, description="Kalimat penutup surat", examples=["Demikian surat tugas ini dibuat untuk dilaksanakan dengan sebaik-baiknya dan melaporkan hasilnya kepada kepala sekolah."])
 
-    model_config = {"json_schema_extra": {"examples": [{"nomor_surat": "800/123/SMK.2/2024", "tanggal_surat": "1 Juli 2024", "tempat_surat": "Singosari"}]}}
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "nomor_surat": "800/123/SMK.2/2024",
+                    "tanggal_surat": "1 Juli 2024",
+                    "tempat_surat": "Singosari",
+                    "perihal": "SURAT TUGAS",
+                    "school_info": {
+                        "nama_sekolah": "SMK NEGERI 2 SINGOSARI",
+                        "alamat_jalan": "Jalan Perusahaan No. 20",
+                        "kelurahan": "Tunjungtirto",
+                        "kecamatan": "Singosari",
+                        "kab_kota": "Kab. Malang",
+                        "provinsi": "Jawa Timur",
+                        "kode_pos": "65153",
+                        "telepon": "(0341) 4345127",
+                        "email": "smkn2singosari@yahoo.co.id",
+                        "website": "www.smkn2singosari.sch.id"
+                    },
+                    "penandatangan": {
+                        "nama": "SUMIJAH, S.Pd., M.Si.",
+                        "jabatan": "Kepala SMK Negeri 2 Singosari",
+                        "nip": "19700210 199802 2 009",
+                        "pangkat": "Pembina Tk. I",
+                        "instansi": "SMK Negeri 2 Singosari"
+                    },
+                    "assignees": [
+                        {
+                            "nama": "Inasni Dyah Rahmatika, S.Pd.",
+                            "jabatan": "Guru",
+                            "nip": "19850101 201001 2 005",
+                            "instansi": "SMK Negeri 2 Singosari"
+                        },
+                        {
+                            "nama": "Budi Santoso, S.Kom.",
+                            "jabatan": "Guru Kejuruan",
+                            "instansi": "SMK Negeri 2 Singosari"
+                        }
+                    ],
+                    "details": [
+                        {"label": "Keperluan", "value": "Pengantaran Siswa Praktik Kerja Lapangan (PKL)", "separator": ":"},
+                        {"label": "Hari / Tanggal", "value": "Senin, 1 Juli 2024", "separator": ":"},
+                        {"label": "Waktu", "value": "08.00 – Selesai", "separator": ":"},
+                        {"label": "Tempat", "value": "BACAMALANG.COM", "separator": ":"},
+                        {"label": "Alamat", "value": "JL. MOROJANTEK NO. 87 B, PANGENTAN, KEC. SINGOSARI, KAB. MALANG", "separator": ":"}
+                    ],
+                    "pembuka": "Kepala SMK Negeri 2 Singosari Dinas Pendidikan Kabupaten Malang menugaskan kepada :",
+                    "penutup": "Demikian surat tugas ini dibuat untuk dilaksanakan dengan sebaik-baiknya dan melaporkan hasilnya kepada kepala sekolah."
+                }
+            ]
+        }
+    }
 
 class LembarPersetujuanRequest(BaseModel):
     """Request schema for Lembar Persetujuan PKL."""
