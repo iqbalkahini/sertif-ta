@@ -75,7 +75,7 @@ class KeyValueItem(BaseModel):
             "examples": [
                 {"label": "Keperluan", "value": "Pengantaran Siswa Praktik Kerja Lapangan (PKL)", "separator": ":"},
                 {"label": "Hari / Tanggal", "value": "Senin, 1 Juli 2024", "separator": ":"},
-                {"label": "Waktu", "value": "08.00 – Selesai", "separator": ":"},
+                {"label": "Waktu", "value": "08.00 - Selesai", "separator": ":"},
                 {"label": "Tempat", "value": "BACAMALANG.COM", "separator": ":"},
                 {"label": "Alamat", "value": "JL. MOROJANTEK NO. 87 B, PANGENTAN, KEC. SINGOSARI, KAB. MALANG", "separator": ":"}
             ]
@@ -155,7 +155,7 @@ class SuratTugasRequest(BaseModel):
                     "details": [
                         {"label": "Keperluan", "value": "Pengantaran Siswa Praktik Kerja Lapangan (PKL)", "separator": ":"},
                         {"label": "Hari / Tanggal", "value": "Senin, 1 Juli 2024", "separator": ":"},
-                        {"label": "Waktu", "value": "08.00 – Selesai", "separator": ":"},
+                        {"label": "Waktu", "value": "08.00 - Selesai", "separator": ":"},
                         {"label": "Tempat", "value": "BACAMALANG.COM", "separator": ":"},
                         {"label": "Alamat", "value": "JL. MOROJANTEK NO. 87 B, PANGENTAN, KEC. SINGOSARI, KAB. MALANG", "separator": ":"}
                     ],
