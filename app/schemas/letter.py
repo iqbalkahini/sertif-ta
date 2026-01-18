@@ -82,6 +82,19 @@ class KeyValueItem(BaseModel):
         }
     }
 
+
+class Student(BaseModel):
+    nama: str = Field(..., description="Nama lengkap siswa", examples=["CHANDA ZULIA LESTARI"])
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {"nama": "CHANDA ZULIA LESTARI"},
+                {"nama": "DIWA SASRI HALIA"}
+            ]
+        }
+    }
+
 # --- Specific Request Models ---
 
 class SuratTugasRequest(BaseModel):
