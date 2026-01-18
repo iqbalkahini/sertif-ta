@@ -66,10 +66,21 @@ class Person(BaseModel):
     }
 
 class KeyValueItem(BaseModel):
-    """Helper for displaying key-value pairs (e.g. 'Waktu' : '08.00')."""
-    label: str
-    value: str
-    separator: str = ":"
+    label: str = Field(..., description="Label/key", examples=["Keperluan"])
+    value: str = Field(..., description="Nilai/value", examples=["Pengantaran Siswa Praktik Kerja Lapangan (PKL)"])
+    separator: str = Field(":", description="Pemisah antara label dan value", examples=[":"])
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {"label": "Keperluan", "value": "Pengantaran Siswa Praktik Kerja Lapangan (PKL)", "separator": ":"},
+                {"label": "Hari / Tanggal", "value": "Senin, 1 Juli 2024", "separator": ":"},
+                {"label": "Waktu", "value": "08.00 – Selesai", "separator": ":"},
+                {"label": "Tempat", "value": "BACAMALANG.COM", "separator": ":"},
+                {"label": "Alamat", "value": "JL. MOROJANTEK NO. 87 B, PANGENTAN, KEC. SINGOSARI, KAB. MALANG", "separator": ":"}
+            ]
+        }
+    }
 
 # --- Specific Request Models ---
 
