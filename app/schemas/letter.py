@@ -2,20 +2,36 @@ from typing import List, Optional, Dict, Any, Union, Annotated
 from pydantic import BaseModel, Field
 
 class SchoolInfo(BaseModel):
-    """Information for the letterhead (Kop Surat)."""
-    nama_sekolah: str
-    alamat_jalan: str
-    kelurahan: str | None = None
-    kecamatan: str | None = None
-    kab_kota: str
-    provinsi: str
-    kode_pos: str | None = None
-    telepon: str | None = None
-    email: str | None = None
-    website: str | None = None
-    logo_url: str | None = None
+    nama_sekolah: str = Field(..., description="Nama lengkap sekolah", examples=["SMK NEGERI 2 SINGOSARI"])
+    alamat_jalan: str = Field(..., description="Alamat jalan sekolah", examples=["Jalan Perusahaan No. 20"])
+    kelurahan: str | None = Field(None, description="Kelurahan/Desa", examples=["Tunjungtirto"])
+    kecamatan: str | None = Field(None, description="Kecamatan", examples=["Singosari"])
+    kab_kota: str = Field(..., description="Kabupaten/Kota", examples=["Kab. Malang"])
+    provinsi: str = Field(..., description="Provinsi", examples=["Jawa Timur"])
+    kode_pos: str | None = Field(None, description="Kode pos", examples=["65153"])
+    telepon: str | None = Field(None, description="Nomor telepon", examples=["(0341) 4345127"])
+    email: str | None = Field(None, description="Alamat email", examples=["smkn2singosari@yahoo.co.id"])
+    website: str | None = Field(None, description="Website sekolah", examples=["www.smkn2singosari.sch.id"])
+    logo_url: str | None = Field(None, description="URL logo sekolah")
 
-    model_config = {"json_schema_extra": {"examples": [{"nama_sekolah": "SMK NEGERI 2 SINGOSARI", "alamat_jalan": "Jalan Perusahaan No. 20", "kab_kota": "Kab. Malang", "provinsi": "Jawa Timur"}]}}
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "nama_sekolah": "SMK NEGERI 2 SINGOSARI",
+                    "alamat_jalan": "Jalan Perusahaan No. 20",
+                    "kelurahan": "Tunjungtirto",
+                    "kecamatan": "Singosari",
+                    "kab_kota": "Kab. Malang",
+                    "provinsi": "Jawa Timur",
+                    "kode_pos": "65153",
+                    "telepon": "(0341) 4345127",
+                    "email": "smkn2singosari@yahoo.co.id",
+                    "website": "www.smkn2singosari.sch.id"
+                }
+            ]
+        }
+    }
 
 class Person(BaseModel):
     """Generic person model for assignees and signatories."""
