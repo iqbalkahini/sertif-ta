@@ -263,3 +263,29 @@ class SertifikatRequest(BaseModel):
     hasil_pkl: str = Field(..., description="Hasil evaluasi ('Amat Baik' / 'Baik' / 'Kurang')", examples=["Amat Baik"])
     tanggal_terbit: str = Field(..., description="Tanggal sertifikat diterbitkan (e.g., '31 Desember 2026')", examples=["31 Desember 2026"])
     nilai: NilaiSertifikat = Field(..., description="Data nilai untuk halaman belakang")
+
+class StudentPenilaian(BaseModel):
+    nama: str = Field(..., description="Nama lengkap siswa", examples=["CHANDA ZULIA LESTARI"])
+    nisn: str = Field(..., description="NISN siswa", examples=["0012345678"])
+    kelas: str = Field(..., description="Kelas siswa", examples=["XII DKV 1"])
+    konsentrasi_keahlian: str = Field(..., description="Konsentrasi Keahlian", examples=["Desain Komunikasi Visual"])
+    tempat_pkl: str = Field(..., description="Tempat PKL", examples=["PT NAMA STUDIOS INDONESIA"])
+    tanggal_mulai: str = Field(..., description="Tanggal Mulai PKL", examples=["1 Juli 2024"])
+    tanggal_selesai: str = Field(..., description="Tanggal Selesai PKL", examples=["31 Desember 2024"])
+    nama_instruktur: str = Field(..., description="Nama Instruktur Dunia Kerja", examples=["Bapak / Ibu Pimpinan"])
+    nama_pembimbing: str = Field(..., description="Nama Guru Pembimbing", examples=["Guru Mapel PKL"])
+
+class NilaiPenilaianDetail(BaseModel):
+    skor_1: float = Field(..., description="Skor untuk Aspek 1", examples=[90.0])
+    desc_1: str = Field("Sangat Baik", description="Deskripsi kualitatif Aspek 1", examples=["Sangat Baik"])
+    skor_2: float = Field(..., description="Skor untuk Aspek 2", examples=[85.0])
+    desc_2: str = Field("Baik", description="Deskripsi kualitatif Aspek 2", examples=["Baik"])
+    skor_3: float = Field(..., description="Skor untuk Aspek 3", examples=[88.0])
+    desc_3: str = Field("Baik", description="Deskripsi kualitatif Aspek 3", examples=["Baik"])
+    skor_4: float = Field(..., description="Skor untuk Aspek 4", examples=[92.0])
+    desc_4: str = Field("Sangat Baik", description="Deskripsi kualitatif Aspek 4", examples=["Sangat Baik"])
+
+class PenilaianRequest(BaseModel):
+    school_info: SchoolInfo = Field(..., description="Informasi sekolah untuk header")
+    siswa: StudentPenilaian = Field(..., description="Data identitas siswa yang dinilai")
+    nilai: NilaiPenilaianDetail = Field(..., description="Detail perolehan skor dan deskripsi siswa")
