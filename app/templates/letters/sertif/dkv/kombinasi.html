@@ -5,12 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sertifikat PKL</title>
-    <!-- Inter Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Great+Vibes&display=swap"
-        rel="stylesheet">
+    <!-- Montserrat Font Local -->
     <style>
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../../font/Montserrat-Black.ttf') format('truetype');
+            font-weight: 900;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../../font/Montserrat-Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../../font/Montserrat-SemiBold.ttf') format('truetype');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../../font/Montserrat-Medium.ttf') format('truetype');
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../../font/Montserrat-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
         @page {
             size: A4 landscape;
             margin: 0;
@@ -20,7 +50,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
 
         body {
@@ -97,7 +127,7 @@
 
         /* NOMOR SERTIFIKAT */
         .nomor {
-            top: 30%;
+            top: 29.8%;
             left: 54%;
             transform: translateX(-50%);
             font-size: 1.3em;
@@ -109,16 +139,18 @@
             top: 42%;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 5em;
-            font-family: 'Great Vibes', cursive;
+            font-size: 3.5em;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
             color: #37a2f1;
             white-space: nowrap;
+            letter-spacing: 0.02em;
         }
 
         /* NISN */
         .nisn-value {
-            top: 50.5%;
-            left: 51.5%;
+            top: 50.2%;
+            left: 52.2%;
             transform: translateX(-50%);
             font-size: 1.5em;
         }
@@ -225,7 +257,7 @@
     <div class="page bg-depan">
         <div class="certificate-container">
             <div class="text nomor font-normal">{{ nomor_sertifikat }}</div>
-            <div class="text nama-siswa-depan font-bold">{{ siswa.nama }}</div>
+            <div class="text nama-siswa-depan font-black">{{ siswa.nama }}</div>
             <div class="text nisn-value font-bold">{{ siswa.nisn }}</div>
 
             <div class="text hasil-pkl font-normal">
