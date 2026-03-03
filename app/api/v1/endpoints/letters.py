@@ -2,7 +2,7 @@ import os
 import re
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
-from app.schemas.letter import LetterRequest, SuratTugasRequest, LembarPersetujuanRequest, PDFResponse, Person, SertifikatRequest
+from app.schemas.letter import LetterRequest, SuratTugasRequest, LembarPersetujuanRequest, PDFResponse, Person, SertifikatRequest, PenilaianRequest
 from app.services.pdf_generator import PDFGenerator
 from app.utils import parse_indonesian_date, preprocess_school_info, get_next_increment
 from app.core import get_logger
@@ -268,4 +268,85 @@ async def generate_sertifikat(jurusan: str, request: SertifikatRequest):
         raise
     except Exception as e:
         logger.error(f"Failed to generate Sertifikat PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+
+@router.post("/penilaian", response_model=PDFResponse, summary="Generate Form Penilaian PKL")
+async def generate_penilaian(request: PenilaianRequest):
+    """
+    Generate Form Penilaian PKL PDF.
+    
+    Creates a 2-page assessment document:
+    - Page 1: Student details, scores for 4 learning objectives
+    - Page 2: Attendance records and signature sections
+    """
+    try:
+        logger.info(f"Generating Form Penilaian for {request.siswa.nama}")
+
+        request.school_info = preprocess_school_info(request.school_info)
+
+        # Calculate totals
+        total_skor = sum([
+            request.nilai.skor_1,
+            request.nilai.skor_2,
+            request.nilai.skor_3,
+            request.nilai.skor_4
+        ])
+        rata_rata = round(total_skor / 4, 2)
+
+        content = {
+            "siswa": {
+                "nama": request.siswa.nama,
+                "nisn": request.siswa.nisn,
+                "kelas": request.siswa.kelas,
+                "konsentrasi_keahlian": request.siswa.konsentrasi_keahlian,
+                "tempat_pkl": request.siswa.tempat_pkl,
+                "tanggal_mulai": request.siswa.tanggal_mulai,
+                "tanggal_selesai": request.siswa.tanggal_selesai,
+                "nama_instruktur": request.siswa.nama_instruktur,
+                "nama_pembimbing": request.siswa.nama_pembimbing
+            },
+            "nilai": {
+                "skor_1": request.nilai.skor_1,
+                "desc_1": request.nilai.desc_1,
+                "skor_2": request.nilai.skor_2,
+                "desc_2": request.nilai.desc_2,
+                "skor_3": request.nilai.skor_3,
+                "desc_3": request.nilai.desc_3,
+                "skor_4": request.nilai.skor_4,
+                "desc_4": request.nilai.desc_4
+            },
+            "total_skor": total_skor,
+            "rata_rata": rata_rata
+        }
+
+        mock_person = {"nama": "Placeholder"}
+
+        generic_request = LetterRequest(
+            template_type="penilaian",
+            nomor_surat="-",
+            tanggal_surat=datetime.now().strftime("%d %B %Y"),
+            perihal="FORM PENILAIAN PKL",
+            school_info=request.school_info,
+            penandatangan=mock_person,
+            content=content
+        )
+
+        student_name = re.sub(r'[^a-zA-Z0-9\s]', '', request.siswa.nama).replace(" ", "_").upper()
+        date_str = datetime.now().strftime("%d-%m-%Y")
+        increment = get_next_increment("PENILAIAN", student_name, date_str)
+        custom_filename = f"PENILAIAN_{student_name}_{date_str}_{increment}.pdf"
+
+        file_path = pdf_service.generate(generic_request, custom_filename=custom_filename)
+        filename = os.path.basename(file_path)
+        file_size = os.path.getsize(file_path)
+
+        logger.info(f"Successfully generated Penilaian PDF: {filename} ({file_size} bytes)")
+
+        return PDFResponse(
+            filename=filename,
+            file_url=f"/api/v1/letters/download/{filename}",
+            file_size=file_size
+        )
+    except Exception as e:
+        logger.error(f"Failed to generate Penilaian PDF: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
