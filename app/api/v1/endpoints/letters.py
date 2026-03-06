@@ -254,8 +254,9 @@ async def generate_sertifikat(jurusan: str, request: SertifikatRequest):
 
         student_name = re.sub(r'[^a-zA-Z0-9\s]', '', request.siswa.nama).replace(" ", "_").upper()
         date_str = datetime.now().strftime("%d-%m-%Y")
-        increment = get_next_increment("SERTIFIKAT", student_name, date_str)
-        custom_filename = f"SERTIFIKAT_{jurusan.upper()}_{student_name}_{date_str}_{increment}.pdf"
+        prefix = f"SERTIFIKAT_{jurusan.upper()}"
+        increment = get_next_increment(prefix, student_name, date_str)
+        custom_filename = f"{prefix}_{student_name}_{date_str}_{increment}.pdf"
 
         file_path = pdf_service.generate(generic_request, custom_filename=custom_filename)
         filename = os.path.basename(file_path)
@@ -340,9 +341,11 @@ async def generate_penilaian(request: PenilaianRequest):
         )
 
         student_name = re.sub(r'[^a-zA-Z0-9\s]', '', request.siswa.nama).replace(" ", "_").upper()
+        konsentrasi = re.sub(r'[^a-zA-Z0-9\s]', '', request.siswa.konsentrasi_keahlian).replace(" ", "_").upper()
         date_str = datetime.now().strftime("%d-%m-%Y")
-        increment = get_next_increment("PENILAIAN", student_name, date_str)
-        custom_filename = f"PENILAIAN_{student_name}_{date_str}_{increment}.pdf"
+        prefix = f"PENILAIAN_{konsentrasi}"
+        increment = get_next_increment(prefix, student_name, date_str)
+        custom_filename = f"{prefix}_{student_name}_{date_str}_{increment}.pdf"
 
         file_path = pdf_service.generate(generic_request, custom_filename=custom_filename)
         filename = os.path.basename(file_path)
