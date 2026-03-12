@@ -6,8 +6,8 @@ class SchoolInfo(BaseModel):
     alamat_jalan: str = Field(..., description="Alamat jalan sekolah", examples=["Jalan Perusahaan No. 20"])
     kelurahan: str | None = Field(None, description="Kelurahan/Desa", examples=["Tunjungtirto"])
     kecamatan: str | None = Field(None, description="Kecamatan", examples=["Singosari"])
-    kab_kota: str = Field(..., description="Kabupaten/Kota", examples=["Kab. Malang"])
-    provinsi: str = Field(..., description="Provinsi", examples=["Jawa Timur"])
+    kab_kota: str | None = Field(None, description="Kabupaten/Kota", examples=["Kab. Malang"])
+    provinsi: str | None= Field(None, description="Provinsi", examples=["Jawa Timur"])
     kode_pos: str | None = Field(None, description="Kode pos", examples=["65153"])
     telepon: str | None = Field(None, description="Nomor telepon", examples=["(0341) 4345127"])
     email: str | None = Field(None, description="Alamat email", examples=["smkn2singosari@yahoo.co.id"])
@@ -77,8 +77,8 @@ class KeyValueItem(BaseModel):
                 {"label": "Keperluan", "value": "Pengantaran Siswa Praktik Kerja Lapangan (PKL)", "separator": ":"},
                 {"label": "Hari / Tanggal", "value": "Senin, 1 Juli 2024", "separator": ":"},
                 {"label": "Waktu", "value": "08.00 - Selesai", "separator": ":"},
-                {"label": "Tempat", "value": "BACAMALANG.COM", "separator": ":"},
-                {"label": "Alamat", "value": "JL. MOROJANTEK NO. 87 B, PANGENTAN, KEC. SINGOSARI, KAB. MALANG", "separator": ":"}
+                {"label": "Tempat", "value": "Institut Teknologi Nasional - Kampus 2", "separator": ":"},
+                {"label": "Alamat", "value": "JL. Raya Karanglo No.KM. 2, Tasikmadu, Kec. Lowokwaru, Kota Malang, Jawa Timur 65153", "separator": ":"}
             ]
         }
     }
@@ -158,8 +158,8 @@ class SuratTugasRequest(BaseModel):
                         {"label": "Keperluan", "value": "Pengantaran Siswa Praktik Kerja Lapangan (PKL)", "separator": ":"},
                         {"label": "Hari / Tanggal", "value": "Senin, 1 Juli 2024", "separator": ":"},
                         {"label": "Waktu", "value": "08.00 - Selesai", "separator": ":"},
-                        {"label": "Tempat", "value": "BACAMALANG.COM", "separator": ":"},
-                        {"label": "Alamat", "value": "JL. MOROJANTEK NO. 87 B, PANGENTAN, KEC. SINGOSARI, KAB. MALANG", "separator": ":"}
+                        {"label": "Tempat", "value": "Institut Teknologi Nasional - Kampus 2", "separator": ":"},
+                        {"label": "Alamat", "value": "JL. Raya Karanglo No.KM. 2, Tasikmadu, Kec. Lowokwaru, Kota Malang, Jawa Timur 65153", "separator": ":"}
                     ],
                     "pembuka": "Kepala SMK Negeri 2 Singosari Dinas Pendidikan Kabupaten Malang menugaskan kepada :",
                     "penutup": "Demikian surat tugas ini dibuat untuk dilaksanakan dengan sebaik-baiknya dan melaporkan hasilnya kepada kepala sekolah."
@@ -239,4 +239,67 @@ class PDFResponse(BaseModel):
             ]
         }
     }
-    
+
+class SiswaSertifikat(BaseModel):
+    nama: str = Field(..., description="Nama lengkap siswa", examples=["Juliana Silva"])
+    nisn: str = Field(..., description="Nomor Induk Siswa Nasional (NISN)", examples=["0123456789"])
+
+class NilaiSertifikat(BaseModel):
+    aspek_1: float = Field(..., description="Nilai Aspek 1", examples=[90.0])
+    desc_1: str = Field("MENERAPKAN SOFT SKILL YANG DIBUTUHKAN DI DUNIA KERJA (TEMPAT PKL).", description="Deskripsi Aspek 1")
+    aspek_2: float = Field(..., description="Nilai Aspek 2", examples=[85.0])
+    desc_2: str = Field("MENERAPKAN NORMA, PROSEDUR OPERASIONAL STANDAR (POS), SERTA KESEHATAN, KESELAMATAN KERJA, DAN LINGKUNGAN HIDUP (K3LH) YANG ADA DI DUNIA KERJA (TEMPAT PKL).", description="Deskripsi Aspek 2")
+    aspek_3: float = Field(..., description="Nilai Aspek 3", examples=[88.0])
+    desc_3: str = Field("MENERAPKAN KOMPETENSI TEKNIS YANG SUDAH DIPELAJARI DI SEKOLAH DAN/ATAU BARU DIPELAJARI DI DUNIA KERJA (TEMPAT PKL).", description="Deskripsi Aspek 3")
+    aspek_4: float = Field(..., description="Nilai Aspek 4", examples=[92.0])
+    desc_4: str = Field("MEMAHAMI ALUR BISNIS DUNIA KERJA TEMPAT PKL DAN WAWASAN WIRAUSAHA.", description="Deskripsi Aspek 4")
+
+class SertifikatRequest(BaseModel):
+    nomor_sertifikat: str = Field(..., description="Nomor surat/sertifikat", examples=["420/1013/101.6.9.19/2026"])
+    siswa: SiswaSertifikat = Field(..., description="Data Siswa")
+    nama_industri: str = Field(..., description="Nama perusahaan/DU/DI tempat PKL", examples=["PT NAMA STUDIOS INDONESIA"])
+    tanggal_mulai: str = Field(..., description="Tanggal mulai PKL (e.g., '14 Juli 2026')", examples=["14 Juli 2026"])
+    tanggal_selesai: str = Field(..., description="Tanggal selesai PKL (e.g., '31 Desember 2026')", examples=["31 Desember 2026"])
+    hasil_pkl: str = Field(..., description="Hasil evaluasi ('Amat Baik' / 'Baik' / 'Kurang')", examples=["Amat Baik"])
+    tanggal_terbit: str = Field(..., description="Tanggal sertifikat diterbitkan (e.g., '31 Desember 2026')", examples=["31 Desember 2026"])
+    nilai: NilaiSertifikat = Field(..., description="Data nilai untuk halaman belakang")
+    nama_pimpinan: str = Field(..., description="Nama pimpinan perusahaan", examples=["Fatkur Amri"])
+    nip_pimpinan: str = Field(..., description="NIP pimpinan perusahaan", examples=["19850101 201001 2 005"])
+    jabatan_pimpinan: str = Field(..., description="Jabatan pimpinan perusahaan", examples=["Direktur Utama PT UBIG"])
+    nama_pembimbing: str = Field(..., description="Nama pembimbing perusahaan", examples=["Ahamd Fauzan"])
+    nip_pembimbing: str = Field(..., description="NIP pembimbing perusahaan", examples=["19850101 201001 2 005"])
+    jabatan_pembimbing: str = Field(..., description="Jabatan pembimbing perusahaan", examples=["Pembimbing"])
+
+class StudentPenilaian(BaseModel):
+    nama: str = Field(..., description="Nama lengkap siswa", examples=["CHANDA ZULIA LESTARI"])
+    nisn: str = Field(..., description="NISN siswa", examples=["0012345678"])
+    kelas: str = Field(..., description="Kelas siswa", examples=["XII DKV 1"])
+    konsentrasi_keahlian: str = Field(..., description="Konsentrasi Keahlian", examples=["Desain Komunikasi Visual"])
+    tempat_pkl: str = Field(..., description="Tempat PKL", examples=["PT NAMA STUDIOS INDONESIA"])
+    tanggal_mulai: str = Field(..., description="Tanggal Mulai PKL", examples=["1 Juli 2024"])
+    tanggal_selesai: str = Field(..., description="Tanggal Selesai PKL", examples=["31 Desember 2024"])
+    nama_instruktur: str = Field(..., description="Nama Instruktur Dunia Kerja", examples=["Bapak / Ibu Pimpinan"])
+    jabatan_instruktur: str = Field(..., description="Jabatan Instruktur Dunia Kerja", examples=["Industrial Engineer"])
+    nip_instruktur: str = Field(..., description="NIP Instruktur Dunia Kerja", examples=["19850101 201001 2 005"])
+    nama_pembimbing: str = Field(..., description="Nama Guru Pembimbing", examples=["Aldian S.Pd."])
+    jabatan_pembimbing: str = Field(..., description="Jabatan Guru Pembimbing", examples=["Guru Mapel PKL"])
+    nip_pembimbing: str = Field(..., description="NIP Guru Pembimbing", examples=["19850101 201001 2 005"])
+
+class NilaiPenilaianDetail(BaseModel):
+    skor_1: float = Field(..., description="Skor untuk Aspek 1", examples=[90.0])
+    desc_1: str = Field("Sangat Baik", description="Deskripsi kualitatif Aspek 1", examples=["Sangat Baik"])
+    skor_2: float = Field(..., description="Skor untuk Aspek 2", examples=[85.0])
+    desc_2: str = Field("Baik", description="Deskripsi kualitatif Aspek 2", examples=["Baik"])
+    skor_3: float = Field(..., description="Skor untuk Aspek 3", examples=[88.0])
+    desc_3: str = Field("Baik", description="Deskripsi kualitatif Aspek 3", examples=["Baik"])
+    skor_4: float = Field(..., description="Skor untuk Aspek 4", examples=[92.0])
+    desc_4: str = Field("Sangat Baik", description="Deskripsi kualitatif Aspek 4", examples=["Sangat Baik"])
+
+class PenilaianRequest(BaseModel):
+    school_info: SchoolInfo = Field(..., description="Informasi sekolah untuk header")
+    siswa: StudentPenilaian = Field(..., description="Data identitas siswa yang dinilai")
+    nilai: NilaiPenilaianDetail = Field(..., description="Detail perolehan skor dan deskripsi siswa")
+    sakit: int = Field(0, description="Jumlah hari sakit", examples=[2])
+    izin: int = Field(0, description="Jumlah hari izin", examples=[1])
+    alpa: int = Field(0, description="Jumlah hari tanpa keterangan (alpa)", examples=[0])
+    tempat_tanggal: str = Field("Singosari, ...........................................", description="Tempat dan tanggal tanda tangan instruktur", examples=["Singosari, 31 Desember 2024"])
