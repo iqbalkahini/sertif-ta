@@ -275,7 +275,11 @@ class StudentPenilaian(BaseModel):
     tanggal_mulai: str = Field(..., description="Tanggal Mulai PKL", examples=["1 Juli 2024"])
     tanggal_selesai: str = Field(..., description="Tanggal Selesai PKL", examples=["31 Desember 2024"])
     nama_instruktur: str = Field(..., description="Nama Instruktur Dunia Kerja", examples=["Bapak / Ibu Pimpinan"])
-    nama_pembimbing: str = Field(..., description="Nama Guru Pembimbing", examples=["Guru Mapel PKL"])
+    jabatan_instruktur: str = Field(..., description="Jabatan Instruktur Dunia Kerja", examples=["Industrial Engineer"])
+    nip_instruktur: str = Field(..., description="NIP Instruktur Dunia Kerja", examples=["19850101 201001 2 005"])
+    nama_pembimbing: str = Field(..., description="Nama Guru Pembimbing", examples=["Aldian S.Pd."])
+    jabatan_pembimbing: str = Field(..., description="Jabatan Guru Pembimbing", examples=["Guru Mapel PKL"])
+    nip_pembimbing: str = Field(..., description="NIP Guru Pembimbing", examples=["19850101 201001 2 005"])
 
 class NilaiPenilaianDetail(BaseModel):
     skor_1: float = Field(..., description="Skor untuk Aspek 1", examples=[90.0])

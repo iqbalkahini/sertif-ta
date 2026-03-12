@@ -307,7 +307,11 @@ async def generate_penilaian(request: PenilaianRequest):
                 "tanggal_mulai": request.siswa.tanggal_mulai,
                 "tanggal_selesai": request.siswa.tanggal_selesai,
                 "nama_instruktur": request.siswa.nama_instruktur,
-                "nama_pembimbing": request.siswa.nama_pembimbing
+                "jabatan_instruktur": request.siswa.jabatan_instruktur,
+                "nip_instruktur": request.siswa.nip_instruktur,
+                "nama_pembimbing": request.siswa.nama_pembimbing,
+                "jabatan_pembimbing": request.siswa.jabatan_pembimbing,
+                "nip_pembimbing": request.siswa.nip_pembimbing
             },
             "nilai": {
                 "skor_1": request.nilai.skor_1,
